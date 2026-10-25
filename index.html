@@ -707,8 +707,8 @@
         d.hidden = false; void d.offsetWidth; d.classList.add('show');
         function center(el) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
         var ps = box.querySelectorAll('p:not([id])');
-        ps.forEach(function (p, i) { setTimeout(function () { p.classList.add('in'); center(p); }, 2200 + i * 4200); });
-        var t = 2200 + ps.length * 4200 + 20000; // ~20s with eyes closed
+        ps.forEach(function (p, i) { setTimeout(function () { p.classList.add('in'); center(p); }, 2200 + i * 7000); });
+        var t = 2200 + ps.length * 7000 + 20000; // ~20s with eyes closed
         setTimeout(function () {
           ['end1', 'end2'].forEach(function (id, i) { var e = document.getElementById(id); e.style.display = ''; setTimeout(function () { e.classList.add('in'); center(e); }, 300 + i * 2500); });
           var a = document.getElementById('again'); a.style.display = ''; setTimeout(function () { a.classList.add('in'); center(document.getElementById('end2')); }, 5500);

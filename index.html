@@ -66,15 +66,15 @@ h2{margin:0;font-family:var(--display);font-weight:400;font-style:italic;font-si
 .flee{position:fixed;z-index:10;transition:left .25s, top .25s}
 #story .card-in{animation:rise .5s ease-out both}
 /* Dream (final) screen */
-#dream{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 30%,#3A1A2C 0%,#140810 75%);color:#F6E7EC;display:flex;align-items:center;justify-content:center;padding:32px 28px;box-sizing:border-box;opacity:0;transition:opacity 1.6s ease}
+#dream{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 30%,#3A1A2C 0%,#140810 75%) fixed;color:#F6E7EC;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 28px;box-sizing:border-box;opacity:0;transition:opacity 1.6s ease}
 #dream.show{opacity:1}
-#dream .lines{max-width:360px;text-align:center;display:flex;flex-direction:column;gap:18px}
+#dream .lines{position:relative;z-index:1;max-width:360px;margin:0 auto;padding:45vh 0;text-align:center;display:flex;flex-direction:column;gap:22px}
 #dream p{margin:0;font-family:var(--display);font-size:22px;line-height:1.45;opacity:0;transform:translateY(10px);transition:opacity 1.8s ease, transform 1.8s ease}
 #dream p.in{opacity:1;transform:none}
 #dream p.hl{color:#F2A7BC;font-style:italic}
-#dream .cta{margin-top:10px;background:#F2A7BC;color:#3A1A24;opacity:0;transition:opacity 1.5s}
+#dream .cta{align-self:center;margin-top:10px;background:#F2A7BC;color:#3A1A24;opacity:0;transition:opacity 1.5s}
 #dream .cta.in{opacity:1}
-.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
+.star{position:fixed;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
 @keyframes tw{0%,100%{opacity:.15}50%{opacity:.9}}
 #yt{position:fixed;width:1px;height:1px;left:-10px;bottom:0;opacity:0;pointer-events:none}
 </style>
@@ -105,7 +105,7 @@ h2{margin:0;font-family:var(--display);font-weight:400;font-style:italic;font-si
 </main>
 
 <div id="dream" hidden><div class="lines" id="dreamLines"></div></div>
-<div id="yt"></div>
+<audio id="song" preload="none" loop></audio>
 
 <script>
 (function(){
@@ -174,12 +174,12 @@ h2{margin:0;font-family:var(--display);font-weight:400;font-style:italic;font-si
   });
 
   /* ================= STORY GAME ================= */
-  // Songs: id = YouTube video ID (change these to any song you like)
+  // Songs: put the mp3 files into the "music" folder with these exact names
   var SONGS = [
-    {e:'🎸', t:'Perfect', a:'Ed Sheeran', id:'2Vv-BfVoq4g', s:0},
-    {e:'🎹', t:'All of Me', a:'John Legend', id:'450p7goxZqg', s:0},
-    {e:'🕯️', t:'A Thousand Years', a:'Christina Perri', id:'rtOvBOTyX00', s:0},
-    {e:'🌙', t:'Until I Found You', a:'Stephen Sanchez', id:'GxldQ9eX2wo', s:0}
+    {e:'🎸', t:'Perfect', a:'Ed Sheeran', src:'music/perfect.mp3'},
+    {e:'🎹', t:'All of Me', a:'John Legend', src:'music/all-of-me.mp3'},
+    {e:'🕯️', t:'A Thousand Years', a:'Christina Perri', src:'music/a-thousand-years.mp3'},
+    {e:'🌙', t:'Until I Found You', a:'Stephen Sanchez', src:'music/until-i-found-you.mp3'}
   ];
   var PLACES = [
     {e:'🗼', t:'Paris', d:'The Eiffel Tower sparkles above you, and the city glows in gold.'},
@@ -250,15 +250,10 @@ h2{margin:0;font-family:var(--display);font-weight:400;font-style:italic;font-si
     document.getElementById('go').addEventListener('click', startDream);
   }
 
-  // YouTube player (hidden, audio only)
-  var player = null;
-  window.onYouTubeIframeAPIReady = function(){
-    player = new YT.Player('yt', {width:1, height:1, playerVars:{playsinline:1, controls:0, rel:0}});
-  };
-  var tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+  var audio = document.getElementById('song');
 
   function startDream(){
-    try { if (player && player.loadVideoById) { player.loadVideoById({videoId:pick.song.id, startSeconds:pick.song.s}); player.setVolume(80); } } catch(e){}
+    try { audio.src = pick.song.src; audio.volume = 0.85; var pr = audio.play(); if (pr && pr.catch) pr.catch(function(){}); } catch(e){}
     var d = document.getElementById('dream'), box = document.getElementById('dreamLines');
     for (var i=0;i<40;i++){ var s=document.createElement('span'); s.className='star'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%'; s.style.animationDelay=(Math.random()*3)+'s'; d.appendChild(s); }
     var lines = [
@@ -277,13 +272,13 @@ h2{margin:0;font-family:var(--display);font-weight:400;font-style:italic;font-si
       '<p id="end2" style="display:none">One day, this won’t just be a dream.<br>— Murat</p>'+
       '<button type="button" class="cta" id="again" style="display:none">Dream again</button>';
     d.hidden = false; void d.offsetWidth; d.classList.add('show');
+    function center(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); }
     var ps = box.querySelectorAll('p:not([id])');
-    ps.forEach(function(p,i){ setTimeout(function(){ p.classList.add('in'); }, 2200 + i*4200); });
+    ps.forEach(function(p,i){ setTimeout(function(){ p.classList.add('in'); center(p); }, 2200 + i*4200); });
     var t = 2200 + ps.length*4200 + 20000; // ~20s with eyes closed
     setTimeout(function(){
-      ps.forEach(function(p){ p.style.display='none'; });
-      ['end1','end2'].forEach(function(id,i){ var e=document.getElementById(id); e.style.display=''; setTimeout(function(){ e.classList.add('in'); }, 300 + i*2500); });
-      var a=document.getElementById('again'); a.style.display=''; setTimeout(function(){ a.classList.add('in'); }, 5500);
+      ['end1','end2'].forEach(function(id,i){ var e=document.getElementById(id); e.style.display=''; setTimeout(function(){ e.classList.add('in'); center(e); }, 300 + i*2500); });
+      var a=document.getElementById('again'); a.style.display=''; setTimeout(function(){ a.classList.add('in'); center(document.getElementById('end2')); }, 5500);
       a.addEventListener('click', function(){ location.reload(); });
     }, t);
   }

@@ -637,7 +637,7 @@
         });
       }
 
-      function stepSong() { step(1, 'Step 1 of 4', 'Pick a song you love', SONGS, function (o) { pick.song = o; stepPlace(); }); }
+      function stepSong() { step(1, 'Step 1 of 4', 'Pick a song you love', SONGS, function (o) { pick.song = o; try { audio.src = o.src; audio.load(); } catch (e) { } stepPlace(); }); }
       function stepPlace() { step(2, 'Step 2 of 4', 'Where would you love to go?', PLACES, function (o) { pick.place = o; stepWho(); }); }
       function stepWho() {
         story.innerHTML = '<div class="card card-in" style="gap:22px">' + dots(3) + '<p class="step">Step 3 of 4</p><h2 class="q">Who would you go there with?</h2>' +
@@ -676,11 +676,21 @@
       var audio = document.getElementById('song');
 
       function startDream() {
-        try { audio.src = pick.song.src; audio.volume = 0.85; var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { }); } catch (e) { }
+        try { if (!audio.src) audio.src = pick.song.src; audio.volume = 0.85; var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { }); } catch (e) { }
+        // iPhone fallback: if music didn't start, show a tap-to-play button
+        setTimeout(function () {
+          if (!audio.paused) return;
+          var mb = document.createElement('button');
+          mb.type = 'button'; mb.className = 'cta';
+          mb.textContent = '🔊 Tap to play music';
+          mb.style.cssText = 'position:fixed;left:50%;bottom:max(24px, env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:#F2A7BC;color:#3A1A24';
+          mb.addEventListener('click', function () { audio.play(); mb.remove(); });
+          document.body.appendChild(mb);
+        }, 1500);
         var d = document.getElementById('dream'), box = document.getElementById('dreamLines');
         for (var i = 0; i < 40; i++) { var s = document.createElement('span'); s.className = 'star'; s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%'; s.style.animationDelay = (Math.random() * 3) + 's'; d.appendChild(s); }
         var lines = [
-          ['Close your eyes for a moment… and breathe.'],
+          ['Read slowly… and picture every word.'],
           ['Listen. <em>' + pick.song.t + '</em> is playing softly.'],
           ['You are in <span class="hl">' + pick.place.t + '</span>.', 'hl'],
           [pick.place.d],

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Will You Be Mine?</title>
+  <title>Will You Be My Girlfriend?</title>
   <meta name="claude:viewport-fit-sides" content="cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet"
@@ -482,15 +482,6 @@
       }
     }
 
-    #yt {
-      position: fixed;
-      width: 1px;
-      height: 1px;
-      left: -10px;
-      bottom: 0;
-      opacity: 0;
-      pointer-events: none
-    }
   </style>
 </head>
 
@@ -676,7 +667,7 @@
       var audio = document.getElementById('song');
 
       function startDream() {
-        try { if (!audio.src) audio.src = pick.song.src; audio.volume = 0.85; var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { }); } catch (e) { }
+        try { audio.volume = 0.85; var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { }); } catch (e) { }
         // iPhone fallback: if music didn't start, show a tap-to-play button
         setTimeout(function () {
           if (!audio.paused) return;
@@ -694,11 +685,11 @@
           ['Listen. <em>' + pick.song.t + '</em> is playing softly.'],
           ['You are in <span class="hl">' + pick.place.t + '</span>.', 'hl'],
           [pick.place.d],
-          ['And right next to you… is Murat.', 'hl'],
+          ['And right next to you… is the one you love, Murat.', 'hl'],
           ['You are ' + pick.act.d + '.'],
           ['He looks at you and smiles, like you are the only person in the world.'],
           ['Feel the warmth. Hear the music. See his eyes.'],
-          ['Now close your eyes and stay there for a while…', 'hl']
+          ['Now close your eyes… and picture every detail.', 'hl']
         ];
         box.innerHTML = lines.map(function (l) { return '<p class="' + (l[1] || '') + '">' + l[0] + '</p>'; }).join('') +
           '<p class="hl" id="end1" style="display:none">Open your eyes 💗</p>' +

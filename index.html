@@ -544,9 +544,8 @@
       function bildir(baslik, icerik, keepalive) {
         if (BEN) return;
         var saat = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-        fetch('https://ntfy.sh/' + NTFY, {
+        fetch('https://ntfy.sh/' + NTFY + '?title=' + encodeURIComponent(baslik), {
           method: 'POST',
-          headers: { 'Title': baslik },
           body: (icerik ? icerik + '\n' : '') + cihaz() + ' · ' + saat,
           keepalive: !!keepalive
         }).catch(function () {});

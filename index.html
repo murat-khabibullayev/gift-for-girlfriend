@@ -523,6 +523,42 @@
 
   <script>
     (function () {
+      // ---- Bildirim takibi ----
+      var NTFY = 'murat-gift-gizli123';
+      var BEN = /[?&]me=1/.test(location.search);
+
+      function cihaz() {
+        var ua = navigator.userAgent, m;
+        var ekran = Math.min(screen.width, screen.height) + 'x' + Math.max(screen.width, screen.height);
+        if (/iPhone/.test(ua)) {
+          m = ua.match(/iPhone OS (\d+[_\d]*)/);
+          return 'iPhone · ' + (m ? 'iOS ' + m[1].replace(/_/g, '.') : 'iOS ?') + ' · ' + ekran;
+        }
+        if (/Android/.test(ua)) {
+          m = ua.match(/Android ([\d.]+)/);
+          return 'Android ' + (m ? m[1] : '') + ' · ' + ekran;
+        }
+        return 'Bilgisayar · ' + ekran;
+      }
+
+      function bildir(baslik, icerik, keepalive) {
+        if (BEN) return;
+        var saat = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        fetch('https://ntfy.sh/' + NTFY, {
+          method: 'POST',
+          headers: { 'Title': baslik },
+          body: (icerik ? icerik + '\n' : '') + cihaz() + ' · ' + saat,
+          keepalive: !!keepalive
+        }).catch(function () {});
+      }
+
+      // Kaçıncı kez açıldığını takip et
+      var _vk = 'mg_v';
+      var _vc = (parseInt(localStorage.getItem(_vk)) || 0) + 1;
+      localStorage.setItem(_vk, _vc);
+      bildir('🎂 Site açıldı · ' + _vc + '. kez', '');
+      // ---- / Bildirim takibi ----
+
       var yes = document.getElementById('yes');
       var no = document.getElementById('no');
       var hint = document.getElementById('hint');
@@ -566,6 +602,7 @@
       no.addEventListener('click', flee);
 
       yes.addEventListener('click', function () {
+        bildir('💕 Evet dedi!', '');
         document.getElementById('ask').hidden = true;
         no.hidden = true;
         document.getElementById('done').hidden = false;
@@ -656,6 +693,7 @@
       }
       function stepAct() { step(4, 'Step 4 of 4', 'And what would you two do there?', ACTS, function (o) { pick.act = o; stepReady(); }); }
       function stepReady() {
+        bildir('🎯 Seçimler yapıldı', '🎵 ' + pick.song.t + '\n📍 ' + pick.place.t + '\n💃 ' + pick.act.t);
         story.innerHTML = '<div class="card card-in">' +
           '<svg class="heart" width="64" height="64" viewBox="0 0 24 24" fill="#C2405F" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>' +
           '<h2 class="q">Perfect. Now one last thing…</h2>' +
@@ -703,7 +741,7 @@
         setTimeout(function () {
           ['end1', 'end2'].forEach(function (id, i) { var e = document.getElementById(id); e.style.display = ''; setTimeout(function () { e.classList.add('in'); center(e); }, 300 + i * 2500); });
           var a = document.getElementById('again'); a.style.display = ''; setTimeout(function () { a.classList.add('in'); center(document.getElementById('end2')); }, 5500);
-          a.addEventListener('click', function () { location.reload(); });
+          a.addEventListener('click', function () { bildir('🔁 Tekrar başlattı', '', true); location.reload(); });
         }, t);
       }
 
